@@ -1,4 +1,0 @@
-# config pour scrapper
-user_agent: "Mozilla/5.0"
-endpoint: "https://www.francetravail.fr/formations"
-timeout: 20
