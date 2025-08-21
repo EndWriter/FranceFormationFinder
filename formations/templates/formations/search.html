@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Recherche de Formations France Travail</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        .result { border: 1px solid #ddd; padding: 1em; margin-bottom: 1em; border-radius: 5px; }
+        .result h3 { margin: 0 0 0.5em 0; }
+        .result p { margin: 0.2em 0; }
+        #results { margin-top: 2em; }
+    </style>
+</head>
+<body>
+    <h1>Recherche de Formations France Travail</h1>
+    <form id="searchForm">
+        <input type="text" id="keyword" placeholder="Mot-clé" required>
+        <button type="submit">Rechercher</button>
+    </form>
+    <div id="results"></div>
+    <script>
+        // formulaire de recherche
+        document.getElementById('searchForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            // on récupère la valeur du mot-clé
+            const keyword = document.getElementById('keyword').value;
+            const resultsDiv = document.getElementById('results');
+            // on affiche un message de chargement
+            resultsDiv.innerHTML = '<p>Recherche en cours...</p>';
+            try {
+                // on effectue la requête
+                const response = await fetch(`/api/formations/search/?keyword=${encodeURIComponent(keyword)}`);
+                // encodeURIComponent evite les conflits de caractères spéciaux
+                const data = await response.json();
+                if (data.length === 0) {
+                    // dans le cas ou on a pas de résultats
+                    resultsDiv.innerHTML = '<p>Aucun résultat trouvé.</p>';
+                } else {
+                    // on affiche les résultats
+                    resultsDiv.innerHTML = data.map(f => `
+                        <div class="result">
+                            <h3>${f.title || ''}</h3>
+                            <p><strong>Description:</strong> ${f.description || ''}</p>
+                            <p><strong>Lieu:</strong> ${f.lieu || ''}</p>
+                            <p><strong>Type:</strong> ${f.type || ''}</p>
+                            <p><strong>Durée/Date:</strong> ${f.time || ''}</p>
+                            <p><strong>Taux de retour à l'emploi:</strong> ${f.taux_retour || ''}</p>
+                        </div>
+                    `).join('');
+                    // on vient faire en sorte d'avoir un affichage html
+                }
+            } catch (err) {
+                // en cas d'erreur
+                resultsDiv.innerHTML = '<p>Erreur lors de la recherche.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
